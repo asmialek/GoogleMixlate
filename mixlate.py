@@ -89,13 +89,15 @@ def mixup(phrase='Hello World!', steps=5, my_src=None, my_dest=None):
 
     for i in range(steps):
         temp_dest = random.choice(languages)
+        path.append(temp_dest)
         temp_text = translator.translate(temp_text, src=temp_src, dest=temp_dest)
-        print(temp_text)
-        path
+        # print(temp_text)
         temp_text = temp_text.text
         temp_src = temp_dest
 
+    print(path)
     return translator.translate(temp_text, src=temp_src, dest=my_dest)
 
-
-print(mixup(steps=50).text)
+text = 'Merry christmas and a happy new year!'
+print(text)
+print(mixup(phrase=text, steps=20).text)
