@@ -1,0 +1,191 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>mixlate &#8212; Google Mixlate  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mixlate</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">googletrans</span> <span class="k">import</span> <span class="n">Translator</span>
+<span class="kn">import</span> <span class="nn">progressbar</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="n">languages</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Afrikaans&#39;</span><span class="p">:</span> <span class="s1">&#39;af&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Albanian&#39;</span><span class="p">:</span> <span class="s1">&#39;sq&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Arabic&#39;</span><span class="p">:</span> <span class="s1">&#39;ar&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Belarusian&#39;</span><span class="p">:</span> <span class="s1">&#39;be&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Bulgarian&#39;</span><span class="p">:</span> <span class="s1">&#39;bg&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Catalan&#39;</span><span class="p">:</span> <span class="s1">&#39;ca&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Chinese Simplified&#39;</span><span class="p">:</span> <span class="s1">&#39;zh-CN&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Chinese Traditional&#39;</span><span class="p">:</span> <span class="s1">&#39;zh-TW&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Croatian&#39;</span><span class="p">:</span> <span class="s1">&#39;hr&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Czech&#39;</span><span class="p">:</span> <span class="s1">&#39;cs&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Danish&#39;</span><span class="p">:</span> <span class="s1">&#39;da&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Dutch&#39;</span><span class="p">:</span> <span class="s1">&#39;nl&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;English&#39;</span><span class="p">:</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Estonian&#39;</span><span class="p">:</span> <span class="s1">&#39;et&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Filipino&#39;</span><span class="p">:</span> <span class="s1">&#39;tl&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Finnish&#39;</span><span class="p">:</span> <span class="s1">&#39;fi&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;French&#39;</span><span class="p">:</span> <span class="s1">&#39;fr&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Galician&#39;</span><span class="p">:</span> <span class="s1">&#39;gl&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;German&#39;</span><span class="p">:</span> <span class="s1">&#39;de&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Greek&#39;</span><span class="p">:</span> <span class="s1">&#39;el&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Hebrew&#39;</span><span class="p">:</span> <span class="s1">&#39;iw&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Hindi&#39;</span><span class="p">:</span> <span class="s1">&#39;hi&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Hungarian&#39;</span><span class="p">:</span> <span class="s1">&#39;hu&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Icelandic&#39;</span><span class="p">:</span> <span class="s1">&#39;is&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Indonesian&#39;</span><span class="p">:</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Irish&#39;</span><span class="p">:</span> <span class="s1">&#39;ga&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Italian&#39;</span><span class="p">:</span> <span class="s1">&#39;it&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Japanese&#39;</span><span class="p">:</span> <span class="s1">&#39;ja&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Korean&#39;</span><span class="p">:</span> <span class="s1">&#39;ko&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Latvian&#39;</span><span class="p">:</span> <span class="s1">&#39;lv&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Lithuanian&#39;</span><span class="p">:</span> <span class="s1">&#39;lt&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Macedonian&#39;</span><span class="p">:</span> <span class="s1">&#39;mk&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Malay&#39;</span><span class="p">:</span> <span class="s1">&#39;ms&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Maltese&#39;</span><span class="p">:</span> <span class="s1">&#39;mt&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Norwegian&#39;</span><span class="p">:</span> <span class="s1">&#39;no&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Persian&#39;</span><span class="p">:</span> <span class="s1">&#39;fa&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Polish&#39;</span><span class="p">:</span> <span class="s1">&#39;pl&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Portuguese&#39;</span><span class="p">:</span> <span class="s1">&#39;pt&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Romanian&#39;</span><span class="p">:</span> <span class="s1">&#39;ro&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Russian&#39;</span><span class="p">:</span> <span class="s1">&#39;ru&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Serbian&#39;</span><span class="p">:</span> <span class="s1">&#39;sr&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Slovak&#39;</span><span class="p">:</span> <span class="s1">&#39;sk&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Slovenian&#39;</span><span class="p">:</span> <span class="s1">&#39;sl&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Spanish&#39;</span><span class="p">:</span> <span class="s1">&#39;es&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Swahili&#39;</span><span class="p">:</span> <span class="s1">&#39;sw&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Swedish&#39;</span><span class="p">:</span> <span class="s1">&#39;sv&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Thai&#39;</span><span class="p">:</span> <span class="s1">&#39;th&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Turkish&#39;</span><span class="p">:</span> <span class="s1">&#39;tr&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Ukrainian&#39;</span><span class="p">:</span> <span class="s1">&#39;uk&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Vietnamese&#39;</span><span class="p">:</span> <span class="s1">&#39;vi&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Welsh&#39;</span><span class="p">:</span> <span class="s1">&#39;cy&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;Yiddish&#39;</span><span class="p">:</span> <span class="s1">&#39;yi&#39;</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="mixup"><a class="viewcode-back" href="../index.html#mixlate.mixup">[docs]</a><span class="k">def</span> <span class="nf">mixup</span><span class="p">(</span><span class="n">phrase</span><span class="o">=</span><span class="s1">&#39;Hello World!&#39;</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">my_src</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">my_dest</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Hello!</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        phrase (str): Lol</span>
+<span class="sd">        steps:</span>
+<span class="sd">        my_src:</span>
+<span class="sd">        my_dest:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">translator</span> <span class="o">=</span> <span class="n">Translator</span><span class="p">()</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">my_src</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">translator</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">phrase</span><span class="p">)</span>
+        <span class="n">temp_src</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">src</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">temp_src</span> <span class="o">=</span> <span class="n">my_src</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">my_dest</span><span class="p">:</span>
+        <span class="n">my_dest</span> <span class="o">=</span> <span class="n">temp_src</span>
+
+    <span class="n">temp_text</span> <span class="o">=</span> <span class="n">phrase</span>
+
+    <span class="n">bar</span> <span class="o">=</span> <span class="n">progressbar</span><span class="o">.</span><span class="n">ProgressBar</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">)):</span>
+        <span class="n">temp_key</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">languages</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="n">temp_dest</span> <span class="o">=</span> <span class="n">languages</span><span class="p">[</span><span class="n">temp_key</span><span class="p">]</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">translator</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">temp_key</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="s1">&#39;en&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">my_dest</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">capitalize</span><span class="p">())</span>
+        <span class="n">temp_text</span> <span class="o">=</span> <span class="n">translator</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">temp_text</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="n">temp_src</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">temp_dest</span><span class="p">)</span>
+        <span class="c1"># print(temp_text)</span>
+        <span class="n">temp_text</span> <span class="o">=</span> <span class="n">temp_text</span><span class="o">.</span><span class="n">text</span>
+        <span class="n">temp_src</span> <span class="o">=</span> <span class="n">temp_dest</span>
+
+    <span class="k">return</span> <span class="n">translator</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">temp_text</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="n">temp_src</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">my_dest</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">path</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Wesołych Świąt i szczęśliwego Nowego Roku!&#39;</span>
+    <span class="n">translation</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">mixup</span><span class="p">(</span><span class="n">phrase</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="n">my_src</span><span class="o">=</span><span class="s1">&#39;pl&#39;</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">item</span> <span class="o">+</span> <span class="s1">&#39;   &#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">translation</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Adam.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
